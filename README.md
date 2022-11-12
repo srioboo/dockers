@@ -4,6 +4,7 @@ Repo para almacenar dockerFiles de utilidad
 
 ## Estructura de Directorios
 
+```
 [root]
  │
  ├─ jenkins                 # Root directory of an image
@@ -12,4 +13,4 @@ Repo para almacenar dockerFiles de utilidad
  ├─ sonarQube
  │   └── README.md 	    # Instructions
  └─ README.md               # Text file containing the name of the maintainer
-
+```
