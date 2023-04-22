@@ -1,0 +1,126 @@
+version: '3.7'
+networks:
+   sirantarnet:
+      name: sirannet
+      driver: bridge
+services:
+## Portainer - Gestor de contenedores ******************************************
+   portainer:
+      container_name: portainer
+      image: portainer/portainer-ce:latest
+      restart: always
+      networks: 
+         sirantarnet:
+      ports:
+        - 9000:9000
+      volumes:
+        - /share/DockerVolumes/portainer:/data
+        - /var/run/docker.sock:/var/run/docker.sock
+## Mariadb - Base de datos *****************************************************
+   mariadb:
+      container_name: mariadb
+      image: mariadb:10.4.12
+      restart: always
+      networks:
+         sirantarnet:
+      ports:
+         - 3307:3307
+      volumes:
+         - /share/DockerVolumes/mariadb:/var/lib/mysql
+         - /share/DockerVolumes/mariadb/mysqlconf:/etc/mysql/conf.d
+         - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+         - PUID=1000
+         - PGID=1000
+         - TZ=Europe/Madrid
+         - MYSQL_ROOT_PASSWORD=SALR_Docker_root
+         - MYSQL_USER=salrio74
+         - MYSQL_PASSWORD=SALR_Docker
+         - MYSQL_DATABASE=nexcloud
+## Watchtower - Actualizacion automatica de contenedores ***********************
+   watchtower:
+      container_name: watchtower
+      image: containrrr/watchtower:latest
+      restart: always 
+      networks:
+         sirantarnet:
+      volumes:
+         - /var/run/docker.sock:/var/run/docker.sock
+      command: --debug --interval 86400
+      environment:
+         - PUID=1000
+         - PGID=1000
+         - TZ=Europe/Madrid
+         - WATCHTOWER_NOTIFICATIONS=email
+         - WATCHTOWER_NOTIFICATION_EMAIL_FROM=salrio74@gmail.com
+         - WATCHTOWER_NOTIFICATION_EMAIL_TO=salrio74@gmail.com
+         - WATCHTOWER_NOTIFICATION_EMAIL_SERVER=smtp.gmail.com
+         - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_USER=salrio74@gmail.com
+         - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PASSWORD=fakepassword
+         - WATCHTOWER_NOTIFICATION_EMAIL_SERVER_PORT=587
+         - WATCHTOWER_NOTIFICATION_EMAIL_DELAY=2
+         - WATCHTOWER_CLEANUP=true
+         - WATCHTOWER_LABEL_ENABLE=true
+         - WATCHTOWER_INCLUDE_RESTARTING=true
+      labels:
+         - "com.centurylinklabs.watchtower.enable=true"
+## Pihole - Servidor DNS *******************************************************
+   pihole:
+      container_name: pihole
+      image: pihole/pihole:latest
+      restart: always
+      hostname: pi.hole
+      dns: 8.8.8.8
+      dns: 1.1.1.1
+      networks:
+         sirantarnet:
+      ports:
+         - 89:80
+         # - 192.168.1.200:53:53/tcp
+         # - 192.168.1.200:53:53/udp
+      volumes:
+         - /share/DockerVolumes/pihole/etc-pihole/:/etc/pihole/ 
+         - /share/DockerVolumes/pihole/etc-dnsmasq.d/:/etc/dnsmasq.d/
+         - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+         - TZ=Europe/Madrid
+         - VIRTUAL_HOST=pi.hole
+         - WEBPASSWORD=QNAP_Docker
+         - DNS1=192.168.1.200
+         - DNS2=no
+         - DNSSEC=False
+         - DNS_BOGUS_PRIV=True
+         - CONDITIONAL_FORWARDING=True
+         - CONDITIONAL_FORWARDING_IP=192.168.1.200
+         - CONDITIONAL_FORWARDING_DOMAIN=home
+      labels:
+         - "com.centurylinklabs.watchtower.enable=true"
+## Nextcloud - Nube privada*****************************************************
+   nextcloud:
+      container_name: nextcloud
+      image: nextcloud:latest
+      restart: always
+      networks:
+         sirantarnet:
+      ports:
+         - 4400:80
+         - 4403:443
+      volumes:
+         - /share/DockerVolumes/nextcloud/nextcloud:/var/www/html
+         - /share/DockerVolumes/nextcloud/apps:/var/www/html/custom_apps
+         - /share/DockerVolumes/nextcloud/config:/var/www/html/config
+         - /share/DockerVolumes/nextcloud/data:/var/www/html/data
+         - /share/DockerVolumes/nextcloud/theme:/var/www/html/themes/temas
+         - /share/DockerVolumes/nextcloud/php/memory-limit.ini:/usr/local/etc/php/conf.d/memory-limit.ini
+         - /var/run/docker.sock:/var/run/docker.sock
+      environment:
+         - PUID=1000
+         - PGID=1000
+         - TZ=Europe/Madrid
+         - NEXTCLOUD_TRUSTED_DOMAINS='localhost'
+         - MYSQL_HOST=mariadb
+         - MYSQL_DATABASE=nexcloud
+         - MYSQL_USER=jmramirez
+         - MYSQL_PASSWORD=QNAP_Docker
+      labels:
+         - "com.centurylinklabs.watchtower.enable=true"
