@@ -1,0 +1,16 @@
+version: "3.3"
+services:
+  kodi:
+    container_name: kodi
+    image: linuxserver/kodi-headless
+    restart: unless-stopped
+    environment:
+      - PGID=1000
+      - PUID=1000
+      - TZ=Europe/Madrid
+    volumes:
+      - ./kodi_data:/c/kodi/config/.kodi
+    ports:
+      - "8200:8080"
+      - "9090:9090"
+      - "9777:9777/udp"
