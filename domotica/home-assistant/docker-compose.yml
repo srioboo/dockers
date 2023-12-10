@@ -9,4 +9,6 @@ services:
       - /etc/localtime:/etc/localtime:ro
     restart: unless-stopped
     privileged: true
-    network_mode: host
+    # network_mode: host # con host no funciona usar ports
+    ports: 
+      - 8123:8123
