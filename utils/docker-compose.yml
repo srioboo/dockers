@@ -151,3 +151,15 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
     restart: unless-stopped
+  ## Homarr - A simple, yet powerful dashboard for your server.
+  homarr:
+    container_name: homarr
+    image: ghcr.io/ajnart/homarr:latest
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock # Optional, only if you want docker integration
+      - /share/DockerVolumes/homarr/configs:/app/data/configs
+      - /share/DockerVolumes/homarr/icons:/app/public/icons
+      - /share/DockerVolumes/homarr/data:/data
+    ports:
+      - '7575:7575'    
