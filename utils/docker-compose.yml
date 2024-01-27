@@ -162,4 +162,4 @@ services:
       - /share/DockerVolumes/homarr/icons:/app/public/icons
       - /share/DockerVolumes/homarr/data:/data
     ports:
-      - '7575:7575'    
+      - "7575:7575"
