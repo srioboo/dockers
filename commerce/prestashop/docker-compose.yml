@@ -1,33 +1,57 @@
-version: '2'
+version: "3"
 services:
-  mariadb:
-    image: docker.io/bitnami/mariadb:10.6
+  mysql:
+    container_name: some-mysql
+    image: mysql:5.7
+    restart: unless-stopped
     environment:
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_USER=bn_prestashop
-      - MARIADB_DATABASE=bitnami_prestashop
-    volumes:
-      - '/SETUP/mariadb/mariadb_data:/bitnami/mariadb'
+      MYSQL_ROOT_PASSWORD: admin
+      MYSQL_DATABASE: prestashop
+    networks:
+      - prestashop_network
+    # volumes:
+    #  - dbdata:/var/lib/mysql
   prestashop:
-    image: docker.io/bitnami/prestashop:8
-    ports:
-      - '80:8080'
-      - '443:8443'
-    environment:
-      - PRESTASHOP_HOST=localhost
-      - PRESTASHOP_DATABASE_HOST=mariadb
-      - PRESTASHOP_DATABASE_PORT_NUMBER=3306
-      - PRESTASHOP_DATABASE_USER=bn_prestashop
-      - PRESTASHOP_DATABASE_NAME=bitnami_prestashop
-      # ALLOW_EMPTY_PASSWORD is recommended only for development.
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - '/SETUP/prestashop/prestashop_data:/bitnami/prestashop'
+    container_name: prestashop
+    image: prestashop/prestashop:latest
+    restart: unless-stopped
     depends_on:
-      - mariadb
-volumes:
-  mariadb_data:
-    driver: local
-  prestashop_data:
-    driver: local
+      - mysql
+    ports:
+      - 8080:80
+    environment:
+      DB_SERVER: some-mysql
+      DB_NAME: prestashop
+      DB_USER: root
+      DB_PASSWD: admin
+      PS_INSTALL_AUTO: 1
+      PS_DOMAIN: localhost:8080
+      PS_FOLDER_ADMIN: admin4577
+      PS_FOLDER_INSTALL: install4577
+    networks:
+      - prestashop_network
+    # volumes:
+    #   - type: bind
+    #  source: ./modules/testModule # local path to the module
+    #    target: /var/www/html/modules/testModule # path to be mounted in the container
+    #     - type: bind
+    #  source: ./themes/myTheme # local path to the theme
+    #       target: /var/www/html/themes/myTheme # path to be mounted in the container
+    # - psdata:/var/www/html
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    links:
+      - mysql
+    environment:
+      PMA_HOST: some-mysql
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+    restart: unless-stopped
+    ports:
+      - 8081:80
+networks:
+  prestashop_network:
+# volumes:
+#  psdata:
+#  dbdata:
