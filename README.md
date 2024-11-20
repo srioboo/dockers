@@ -14,3 +14,11 @@ Homelab repository
  │   └── README.md 	    # Instructions
  └─ README.md               # Text file containing the name of the maintainer
 ```
+# Domotica
+
+## Home Assistant
+
+Docker compose files for:
+
+- Home assistant
+- Home bridge
