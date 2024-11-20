@@ -1,8 +1,8 @@
-# Dockers
+# Homelab
 
-Repo para almacenar dockerFiles de utilidad
+Homelab repository
 
-## Estructura de Directorios
+## Directory structure
 
 ```
 [root]
