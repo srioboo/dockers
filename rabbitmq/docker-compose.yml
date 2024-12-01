@@ -1,0 +1,11 @@
+name: 'rabbitmq-4'
+services:
+    rabbitmq:
+        image: 'rabbitmq:4.0-management'
+        ports:
+            - '15672:15672'
+            - '5672:5672'
+        container_name: rabbitmq
+        tty: true
+        stdin_open: true
+
